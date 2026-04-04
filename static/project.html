@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project - NikkoParse</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <div class="project-header">
+            <div class="project-title-row">
+                <a href="/" class="home-icon-btn" title="Back to Projects">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+                <div>
+                    <h1 id="projectName" contenteditable="true" title="Click to edit project name">Loading...</h1>
+                    <p id="projectStats"></p>
+                </div>
+            </div>
+            <div>
+                <button id="runExtractionBtn" class="btn-primary" style="display:none">Run Extraction</button>
+            </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div id="uploadSection" class="panel">
+            <button id="addFilesBtn" class="clickable-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                Add PDF Files
+            </button>
+            
+            <!-- Files List -->
+            <div id="filesList" style="display:none">
+                <select id="filesDropdown" style="display:none;width:100%;padding:12px;font-size:14px;margin-bottom:12px;border-radius:10px;border:1px solid var(--gray-300)" onchange="selectFileFromDropdown(this.value)">
+                    <option value="">Select a file...</option>
+                </select>
+                <div id="filesListContainer"></div>
+            </div>
+        </div>
+
+        <!-- Document Viewer Section -->
+        <div id="viewerSection" style="display:none">
+            <!-- Document Preview with Sidebar for Add Button -->
+            <div class="panel" style="margin-bottom:20px">
+                <div class="preview-header">
+                    <h3>Document Preview</h3>
+                    <span class="preview-instruction">— Select important information and add examples with <strong>+</strong></span>
+                </div>
+                <div class="preview-container">
+                    <div id="documentPreview" class="document-preview">
+                        Select a file to view its content
+                    </div>
+                    <div id="previewSidebar" class="preview-sidebar">
+                        <button id="createFieldBtn" class="btn-add-field" style="display:none" title="Add field to schema">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extraction Table with Header -->
+            <div id="extractionTableSection" class="panel" style="display:none">
+                <!-- Table Header (always visible when table exists) -->
+                <div id="extractionHeader" class="extraction-table-header">
+                    <div class="extraction-header-content">
+                        <div class="extraction-header-left">
+                            <h3 style="margin:0;color:var(--accent-orange)">Data Extraction</h3>
+                            <span class="info-icon" data-tooltip="Workflow: 1) Select text and add examples with + button  2) Auto-Generate (instant) or use AI for complex patterns  3) View extracted data in the table below">i</span>
+                            <button id="suggestFieldsBtn" class="btn-secondary btn-sm">Suggested Fields</button>
+                        </div>
+                        <div class="extraction-header-right">
+                            <button id="autoGenerateBtn" class="btn-primary" onclick="autoGenerateSchema()">Auto-Generate Schema</button>
+                            <button id="aiSchemaBuilderBtn" class="btn-secondary" onclick="openAISchemaBuilder()">AI Schema Builder</button>
+                            <button id="exportTsvBtn" class="btn-secondary">Export as TSV</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Content -->
+                <div id="tableContainer" class="extraction-table-wrapper"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div id="uploadModal" class="modal" style="display:none">
+        <div class="modal-content" style="max-width:500px">
+            <div class="modal-header">
+                <h3>Add PDF Files</h3>
+                <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-zone" id="uploadZone">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;color:var(--gray-400)">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <p style="color:var(--gray-600);font-weight:500">Drop PDF files here or click to browse</p>
+                    <p style="color:var(--gray-400);font-size:12px;margin-top:8px">Supports multiple files</p>
+                    <input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
+                </div>
+                <div id="uploadProgressList" class="upload-progress-list" style="display:none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Suggestions Modal -->
+    <div id="suggestionsModal" class="modal" style="display:none">
+        <div class="modal-content" style="max-width:700px">
+            <div class="modal-header">
+                <h3>Suggested Fields</h3>
+                <button class="modal-close" onclick="closeSuggestionsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:15px;color:#666">
+                    Select fields to add to your schema:
+                </p>
+                <div id="suggestionsList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSuggestionsModal()">Close</button>
+                <button class="btn-primary" onclick="addSelectedSuggestions()">Add Selected Fields</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Creation Modal -->
+    <div id="fieldModal" class="modal" style="display:none">
+        <div class="modal-content" style="max-width:500px">
+            <div class="modal-header">
+                <h3 id="fieldModalTitle">Add Field Example</h3>
+                <button class="modal-close" onclick="closeFieldModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Field Label</label>
+                    <div class="field-label-input-container">
+                        <input type="text" id="fieldLabel" placeholder="Type new label or select existing..." list="existingLabels" autocomplete="off">
+                        <datalist id="existingLabels"></datalist>
+                    </div>
+                    <small id="existingLabelHint" style="color:#666;display:none">Adding another example to existing field</small>
+                </div>
+                <div class="form-group" id="selectedValueGroup">
+                    <label>Selected Text (Example Value)</label>
+                    <textarea id="selectedValue" readonly rows="3" style="background:#f5f5f5"></textarea>
+                </div>
+                <div class="form-group" id="existingExamplesGroup" style="display:none">
+                    <label>Existing Examples for this Field</label>
+                    <div id="existingExamplesList" style="background:#f5f5f5;padding:10px;border-radius:4px;max-height:150px;overflow-y:auto"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeFieldModal()">Cancel</button>
+                <button class="btn-primary" id="saveFieldBtn" onclick="saveNewField()">Add Example</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cell Editor Modal -->
+    <div id="cellEditorModal" class="modal" style="display:none">
+        <div class="modal-content" style="max-width:400px">
+            <div class="modal-header">
+                <h3>Edit Value</h3>
+                <button class="modal-close" onclick="closeCellEditor()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:15px">
+                    <strong style="color:var(--gray-600)">File:</strong> <span id="cellEditorFilename" style="color:var(--gray-800)"></span><br>
+                    <strong style="color:var(--gray-600)">Field:</strong> <span id="cellEditorFieldname" style="color:var(--gray-800)"></span>
+                </div>
+                <input type="text" id="cellEditorInput" style="width:100%;padding:12px;font-size:14px;border:1px solid var(--gray-300);border-radius:8px" 
+                       onkeydown="if(event.key==='Enter'){saveCellEdit();} if(event.key==='Escape'){closeCellEditor();}">
+                <p style="font-size:12px;color:var(--gray-500);margin-top:10px">
+                    This override will be saved and used instead of the regex-extracted value.
+                </p>
+            </div>
+            <div class="modal-footer" style="display:flex;justify-content:space-between">
+                <button id="cellEditorClearBtn" class="btn-secondary" onclick="clearCellOverride()" style="display:none">
+                    Clear Override
+                </button>
+                <div style="display:flex;gap:10px;margin-left:auto">
+                    <button class="btn-secondary" onclick="closeCellEditor()">Cancel</button>
+                    <button class="btn-primary" onclick="saveCellEdit()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Schema Builder Modal -->
+    <div id="aiSchemaBuilderModal" class="modal" style="display:none">
+        <div class="modal-content" style="max-width:900px">
+            <div class="modal-header">
+                <h3>AI Schema Builder</h3>
+                <button class="modal-close" onclick="closeAISchemaBuilder()">&times;</button>
+            </div>
+            <div class="modal-body" style="display:flex;gap:24px">
+                <!-- Left Column: Export/Copy -->
+                <div style="flex:1;border-right:1px solid var(--gray-200);padding-right:24px">
+                    <h4 style="margin-top:0;color:var(--accent-orange)">Step 1: Copy Prompt</h4>
+                    <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">
+                        Copy this prompt and paste into Claude, ChatGPT, or any AI.
+                    </p>
+                    <textarea id="aiPromptText" rows="16" readonly style="font-family:monospace;font-size:11px;width:100%;border-radius:8px;border:1px solid var(--gray-300);padding:12px"></textarea>
+                    <button id="copyPromptBtn" class="btn-primary" style="margin-top:12px;width:100%">
+                        Copy to Clipboard
+                    </button>
+                </div>
+                
+                <!-- Right Column: Import/Paste -->
+                <div style="flex:1;padding-left:24px">
+                    <h4 style="margin-top:0;color:var(--accent-orange)">Step 2: Paste AI Response</h4>
+                    <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">
+                        Paste the JSON from the AI here. Extraction runs automatically.
+                    </p>
+                    <textarea id="aiImportText" rows="10" placeholder='{"fields": [...]}' style="font-family:monospace;font-size:11px;width:100%;border-radius:8px;border:1px solid var(--gray-300);padding:12px"></textarea>
+                    
+                    <div id="aiImportPreview" style="display:none;margin-top:12px">
+                        <strong style="font-size:12px;color:var(--gray-700)">Preview:</strong>
+                        <div id="aiImportPreviewContent" style="background:var(--gray-100);padding:12px;border-radius:8px;max-height:120px;overflow-y:auto;font-size:12px"></div>
+                    </div>
+                    
+                    <div id="aiImportError" style="display:none;margin-top:12px;padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;color:#dc2626;font-size:12px;white-space:pre-wrap"></div>
+                    
+                    <button id="validateImportBtn" class="btn-primary" onclick="validateAndImportAI()" style="margin-top:12px;width:100%">
+                        Validate & Import
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeAISchemaBuilder()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/project.js"></script>
+</body>
+</html>

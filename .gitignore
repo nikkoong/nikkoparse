@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+*.log
+
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files and data
+payslips/
+con_ed_bills/
+con_ed_bills_output/
+test_401k_pattern.py
+test_ai_workflow.py
+watch_ai_prompt_tests.py
+generate_additional_fields.py
+additional_fields.json
+
+# Documentation archives
+archive_docs/
+PACKAGING.md
+
+# Temporary files
+staging/
+*.tmp
+*.bak
+flask.log
+
+# LiteParse
+eng.traineddata
+
+# User data (should be in ~/Documents/NikkoParse_Data/)
+projects/
+*.pdf
+*.json.extracted
+raw/
+extracted/
+
+# Environment files (if added later)
+.env
+.env.local
+credentials.json
+secrets.json

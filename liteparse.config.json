@@ -1,0 +1,7 @@
+{
+  "ocrEnabled": true,
+  "ocrLanguage": "en",
+  "outputFormat": "json",
+  "preciseBoundingBox": true,
+  "dpi": 150
+}

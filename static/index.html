@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NikkoParse</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NikkoParse</h1>
+        </header>
+
+        <div id="projectsList" class="projects-list">
+            <div class="loading">Loading projects...</div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div id="newProjectModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Create New Project</h2>
+            <input type="text" id="projectNameInput" placeholder="Enter project name" />
+            <div class="modal-actions">
+                <button id="cancelBtn" class="btn-secondary">Cancel</button>
+                <button id="createBtn" class="btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Delete Project?</h2>
+            <p>This will permanently delete all files and data for this project.</p>
+            <div class="modal-actions">
+                <button id="deleteCancelBtn" class="btn-secondary">Cancel</button>
+                <button id="deleteConfirmBtn" class="btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/home.js"></script>
+</body>
+</html>
