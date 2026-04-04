@@ -15,6 +15,10 @@ build/
 .ruff_cache/
 *.log
 
+# Tests
+tests/
+test_*.py
+
 # Node.js
 node_modules/
 package-lock.json
