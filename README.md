@@ -1,6 +1,6 @@
 # NikkoParse
 
-A local macOS tool for extracting structured data from PDF documents using intelligent regex pattern generation.
+A local tool for extracting structured data from PDF documents using intelligent regex pattern generation.
 
 ![Version](https://img.shields.io/badge/version-1.0-blue)
 ![Python](https://img.shields.io/badge/python-3.9+-green)
@@ -64,6 +64,16 @@ A local macOS tool for extracting structured data from PDF documents using intel
 ---
 
 ## Usage
+
+![Homepage](image-3.png)
+
+![Document Preview](image.png)
+
+![Field Definition](image-1.png)
+
+![Extraction Results](image-2.png)
+
+
 
 ### 1. Create a Project
 
